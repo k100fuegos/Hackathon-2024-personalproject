@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/plugins/qrCode.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto p-4 flex gap-4">
+        <!-- Panel Izquierdo - Wallets Registradas -->
+        <div class="w-1/2 bg-gray-800 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Wallets Registradas</h2>
+                <button id="addWalletBtn" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
+                    Agregar Wallet
+                </button>
+            </div>
+            <div id="walletsList" class="space-y-2">
+                <!-- Las wallets se agregarán aquí dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Panel Derecho - Wallet Principal -->
+        <div class="w-1/2 bg-gray-800 p-4 rounded-lg">
+            <h2 class="text-xl font-bold mb-4">Wallet Principal</h2>
+            <div class="mb-6">
+                <p class="text-gray-400 mb-2">Balance disponible:</p>
+                <p id="mainBalance" class="text-3xl font-bold">0 SATS</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-400 mb-2">Cantidad a enviar:</label>
+                    <input type="number" id="sendAmount" class="w-full bg-gray-700 p-2 rounded" placeholder="Cantidad en SATS">
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-2">Seleccionar wallets destino:</label>
+                    <div class="bg-gray-700 p-2 rounded">
+                        <div class="mb-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="selectAllWallets" class="mr-2">
+                                Seleccionar todas las wallets
+                            </label>
+                        </div>
+                        <div id="destinationWallets" class="space-y-2 max-h-40 overflow-y-auto">
+                            <!-- Las opciones de wallets se agregarán aquí -->
+                        </div>
+                    </div>
+                </div>
+                <button id="sendSatsBtn" class="w-full bg-green-500 px-4 py-2 rounded hover:bg-green-600">
+                    Enviar SATS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar wallet -->
+    <div id="addWalletModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 class="text-xl font-bold mb-4">Agregar Wallet</h3>
+            <div class="space-y-4">
+                <div class="flex gap-2">
+                    <button id="scanQrBtn" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 flex-1">
+                        Escanear QR
+                    </button>
+                    <button id="manualInputBtn" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 flex-1">
+                        Ingresar URL
+                    </button>
+                </div>
+                <div id="manualInput" class="hidden">
+                    <label class="block text-gray-400 mb-2">LNURL de pago:</label>
+                    <input type="text" id="walletUrl" class="w-full bg-gray-700 p-2 rounded" placeholder="Ingrese el LNURL">
+                    <button id="submitUrlBtn" class="w-full bg-green-500 px-4 py-2 rounded hover:bg-green-600 mt-2">
+                        Confirmar LNURL
+                    </button>
+                </div>
+                <button id="cancelAddBtn" class="w-full bg-red-500 px-4 py-2 rounded hover:bg-red-600">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para escanear QR -->
+    <div id="scannerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 class="text-xl font-bold mb-4">Escanear Wallet</h3>
+            <div class="relative">
+                <canvas id="qr-canvas" class="w-full h-64 bg-black mb-4"></canvas>
+                <div class="flex gap-2 mb-4">
+                    <button id="toggleCameraBtn" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
+                        Activar Cámara
+                    </button>
+                    <button id="cancelScanBtn" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para nombrar wallet -->
+    <div id="nameWalletModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 class="text-xl font-bold mb-4">Nombrar Wallet</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-400 mb-2">LNURL:</label>
+                    <input type="text" id="walletAddress" class="w-full bg-gray-700 p-2 rounded" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-400 mb-2">Nombre de la wallet:</label>
+                    <input type="text" id="walletName" class="w-full bg-gray-700 p-2 rounded" placeholder="Ingrese un nombre">
+                </div>
+                <div class="flex gap-2">
+                    <button id="saveWalletBtn" class="bg-green-500 px-4 py-2 rounded hover:bg-green-600 flex-1">
+                        Guardar
+                    </button>
+                    <button id="cancelNameBtn" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600 flex-1">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioScaner" src="assets/sonido.mp3"></audio>
+    <script src="wallet-manager.js"></script>
+</body>
+</html>
